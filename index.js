@@ -5,7 +5,7 @@ const sqlite = require('sqlite');
 
 const HomeControl = new Commando.Client({
 	owner: '147604925612818432',
-	commandPrefix: '.',
+	commandPrefix: secure.dev ? '!' : '.',
 	unknownCommandResponse: false,
 });
 
@@ -27,4 +27,4 @@ HomeControl.setProvider(
 	sqlite.open(path.join(__dirname, 'settings.sqlite3')).then((settingsProvider) => new Commando.SQLiteProvider(settingsProvider))
 ).catch(console.error);
 
-HomeControl.login(secure.discordAPIKey);
+HomeControl.login(secure.dev ? secure.devDiscordAPIKey : secure.discordAPIKey);

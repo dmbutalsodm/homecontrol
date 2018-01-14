@@ -4,58 +4,38 @@ const hm = new HueManager();
 const request = require('request-promise');
 hm.setBridge(credentials.hue.ip).setUser(credentials.hue.username);
 
+function stringToBool(onOrOff) {
+	return onOrOff == 'off' ? false : true;
+}
+
 module.exports = {
-	on: {
-		kitchen: async function(msg) {
+	toggles: {
+		kitchen: async function(msg, onOrOff) {
+			onOrOff = stringToBool(onOrOff.toLowerCase());
 			hm.getLightsByGroupName('Kitchen').then((bulbs) => {
 				bulbs.forEach((bulb) => {
-					bulb.turnOn();
+					onOrOff ? bulb.turnOn() : bulb.turnOff();
 				});
 			}).then(() => {
-				msg.say('The **Kitchen lights** are now turned on.');
+				msg.say(`The **Kitchen lights** are now turned ${onOrOff ? 'on' : 'off'}.`);
 			});
 		},
-		kuwar: async function(msg) {
+		kuwar: async function(msg, onOrOff) {
+			onOrOff = stringToBool(onOrOff.toLowerCase());
 			hm.getLightsByName('Kuwar1').then((bulb) => {
-				bulb[0].turnOn();
+				onOrOff ? bulb[0].turnOn() : bulb[0].turnOff();
 			}).then(() => {
-				msg.say('The **Kuwar light** is now turned on.');
+				msg.say(`The **Kuwar light** are now turned ${onOrOff ? 'on' : 'off'}.`);
 			});
 		},
-		fish: async function(msg) {
+		fish: async function(msg, onOrOff) {
+			onOrOff = stringToBool(onOrOff.toLowerCase());
 			request({
-				uri: `https://maker.ifttt.com/trigger/fishLightsOn/with/key/${credentials.ifttt.key}`,
+				uri: `https://maker.ifttt.com/trigger/fishLights${onOrOff ? 'On' : 'Off'}/with/key/${credentials.ifttt.key}`,
 				method: 'POST',
 				json: true,
 			}).then(() => {
-				msg.say('The **fish lights** are now turned on.');
-			});
-		},
-	},
-	off: {
-		kitchen: async function(msg) {
-			hm.getLightsByGroupName('Kitchen').then((bulbs) => {
-				bulbs.forEach((bulb) => {
-					bulb.turnOff();
-				});
-			}).then(() => {
-				msg.say('The **kitchen lights** are now turned off.');
-			});
-		},
-		kuwar: async function(msg) {
-			hm.getLightsByName('Kuwar1').then((bulb) => {
-				bulb[0].turnOff();
-			}).then(() => {
-				msg.say('The **Kuwar light** is now turned off.');
-			});
-		},
-		fish: async function(msg) {
-			request({
-				uri: `https://maker.ifttt.com/trigger/fishLightsOff/with/key/${credentials.ifttt.key}`,
-				method: 'POST',
-				json: true,
-			}).then(() => {
-				msg.say('The **fish lights** are now turned off.');
+				msg.say(`The **fish lights** are now turned ${onOrOff ? 'on' : 'off'}.`);
 			});
 		},
 	},
